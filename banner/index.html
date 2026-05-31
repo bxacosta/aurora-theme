@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/internet-development/www-server-mono@latest/server-mono.css">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@600&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <title>Aurora Theme - JetBrains IDE Theme</title>
+    <style>
+        :root {
+            /* Defaults — adjustable live from the floating panel (saved to localStorage). */
+            --banner-w: 1600px;
+            --banner-h: 1000px;
+            --banner-pad-x: 0px;   /* horizontal frame padding */
+            --banner-pad-y: 0px;   /* vertical offset of the content (0 = centered) */
+            --content-max: 1400px;
+            --title-size: 72px;
+            --logo-size: 80px;
+            --logo-x: 0px;         /* move the logo independently */
+            --logo-y: 0px;
+            --title-x: 0px;        /* move the title independently */
+            --title-y: 0px;
+            --img-scale: 100;      /* percent, used as scale(--img-scale / 100) */
+            --img-x: 0px;          /* pan the image INSIDE the frame */
+            --img-y: 0px;
+            --frame-x: 0px;        /* move the whole preview block (frame + image) */
+            --frame-y: 0px;
+            --bg-scale: 120;       /* background zoom, percent (100 = cover) */
+            --bg-x: 0px;           /* background pan */
+            --bg-y: 40px;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Neutral page background around the artboard — NOT part of the capture. */
+            background: #08090b;
+            font-family: "ServerMono", sans-serif;
+        }
+
+        /* ── The artboard: capture THIS node (Elements → right-click → Capture node screenshot) ── */
+        #banner {
+            position: relative;
+            width: var(--banner-w);
+            height: var(--banner-h);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 var(--banner-pad-x);
+            box-sizing: border-box;
+            background: #08090b;
+        }
+
+        /* Background image as a transformable layer (so it can be zoomed/panned). */
+        .bg-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transform: translate(var(--bg-x), var(--bg-y)) scale(calc(var(--bg-scale) / 100));
+            transform-origin: center;
+        }
+
+        #banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            mix-blend-mode: overlay;
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: var(--content-max);
+            transform: translateY(var(--banner-pad-y));
+        }
+
+        .icon-container {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            transform: translate(var(--logo-x), var(--logo-y));
+        }
+
+        .banner-logo {
+            width: var(--logo-size);
+            height: var(--logo-size);
+        }
+
+        .banner-title {
+            font-family: "Geist Mono", ui-monospace, monospace;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            font-size: var(--title-size);
+            line-height: 1.05;
+            transform: translate(var(--title-x), var(--title-y));
+        }
+
+        .glass-border {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .gradient-border {
+            position: relative;
+        }
+
+        .gradient-border::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: -2px;
+            right: -2px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent 0%, rgba(93, 228, 199, 0.8) 10%, rgba(93, 228, 199, 0.8) 20%, rgba(121, 192, 255, 0.8) 70%, rgba(210, 168, 255, 0.8) 90%, transparent 100%);
+            border-radius: 0 0 12px 12px;
+        }
+
+        /* Clip wrapper so the preview image can be zoomed/panned without showing its edges.
+           Kept separate from .gradient-border so the gradient underline (which sits outside) isn't clipped. */
+        .preview-clip {
+            overflow: hidden;
+            border-radius: 8px;
+            line-height: 0;
+        }
+        .preview-img {
+            transform: translate(var(--img-x), var(--img-y)) scale(calc(var(--img-scale) / 100));
+            transform-origin: center;
+        }
+        /* Moves the entire framed preview (frame + gradient + image) as one block. */
+        .preview-frame {
+            transform: translate(var(--frame-x), var(--frame-y));
+        }
+
+        /* ── Floating control panel (never part of the #banner capture) ──────── */
+        #panel {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+            width: 260px;
+            background: rgba(13, 17, 23, 0.92);
+            border: 1px solid #1f2328;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            color: #d1d7e0;
+            font: 12px/1.4 "ServerMono", ui-monospace, monospace;
+            backdrop-filter: blur(8px);
+            user-select: none;
+        }
+        #panel header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 12px; cursor: pointer;
+            border-bottom: 1px solid #1f2328;
+        }
+        #panel header b { color: #f0f6fc; font-weight: 600; letter-spacing: .5px; }
+        #panel header .chev { color: #6f737a; transition: transform .15s; }
+        #panel.collapsed .chev { transform: rotate(-90deg); }
+        #panel.collapsed .body { display: none; }
+        #panel .body { padding: 10px 12px 12px; }
+
+        .tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
+        .tabs button {
+            flex: 1 1 calc(50% - 2px); background: transparent; color: #9198a1; border: 1px solid #1f2328;
+            border-radius: 8px; padding: 6px 4px; font: inherit; cursor: pointer; white-space: nowrap;
+        }
+        .tabs button.active { background: #247ce0; color: #fff; border-color: #247ce0; }
+
+        .pane { display: none; flex-direction: column; gap: 12px; }
+        .pane.active { display: flex; }
+
+        .row label { display: flex; justify-content: space-between; color: #9198a1; margin-bottom: 4px; }
+        .row label .val { color: #71aaeb; }
+        .row .inputs { display: flex; align-items: center; gap: 8px; }
+        .row input[type=range] { flex: 1; accent-color: #247ce0; min-width: 0; }
+        .row input[type=number] {
+            width: 60px; background: #090a0c; border: 1px solid #1f2328; border-radius: 6px;
+            color: #d1d7e0; padding: 3px 6px; font: inherit; text-align: right;
+        }
+        .actions { display: flex; gap: 8px; margin-top: 12px; }
+        .actions button {
+            flex: 1; background: #1f2937; color: #d1d7e0; border: 1px solid #2d3742;
+            border-radius: 8px; padding: 7px 8px; font: inherit; cursor: pointer;
+        }
+        .actions button:hover { background: #2a3441; }
+        .hint { color: #6f737a; font-size: 10px; line-height: 1.5; margin-top: 10px; }
+        .hint code { color: #9198a1; }
+    </style>
+</head>
+<body>
+<div id="banner">
+    <img class="bg-layer" src="bacground.webp" alt="">
+    <div class="content text-center">
+        <!-- Title with Icon (logo referenced from the plugin resources — single source of truth) -->
+        <div class="flex items-center justify-center mb-7">
+            <div class="icon-container mr-6">
+                <img class="banner-logo" src="../src/main/resources/META-INF/pluginIcon.svg" alt="Aurora logo">
+            </div>
+            <h1 class="banner-title text-[#F0F6FC] text-shadow-lg">Aurora</h1>
+        </div>
+
+        <!-- Preview Image -->
+        <div class="preview-frame glass-border gradient-border p-1 bg-[#0d1117]/60">
+            <div class="preview-clip">
+                <img class="preview-img w-full h-auto" src="preview.png" alt="Aurora Theme Preview"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating control panel -->
+<div id="panel">
+    <header id="panelHead">
+        <b>Banner controls</b>
+        <span class="chev">▾</span>
+    </header>
+    <div class="body">
+        <div class="tabs" id="tabs"></div>
+        <div id="panes"></div>
+        <div class="actions">
+            <button id="resetBtn">Reset</button>
+            <button id="copyBtn">Copy CSS</button>
+        </div>
+        <div class="hint">
+            Capture: Elements → right-click <code>#banner</code> → <b>Capture node screenshot</b>. This panel is never included.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Groups of controls. Each control: [label, css-var, min, max, default, cssUnit, displayUnit]
+    const GROUPS = [
+        { name: "Layout", controls: [
+            ["Width",         "--banner-w",     800, 2400, 1600, "px", "px"],
+            ["Height",        "--banner-h",     400, 1600, 1000, "px", "px"],
+            ["Padding X",     "--banner-pad-x",   0,  400,    0, "px", "px"],
+            ["Padding Y",     "--banner-pad-y", -600,  600,    0, "px", "px"],
+            ["Content width", "--content-max",  400, 2000, 1400, "px", "px"],
+        ]},
+        { name: "Brand", controls: [
+            ["Title size",    "--title-size",    24,  160,   72, "px", "px"],
+            ["Logo size",     "--logo-size",     24,  240,   80, "px", "px"],
+            ["Logo X",        "--logo-x",      -400,  400,    0, "px", "px"],
+            ["Logo Y",        "--logo-y",      -400,  400,    0, "px", "px"],
+            ["Title X",       "--title-x",     -400,  400,    0, "px", "px"],
+            ["Title Y",       "--title-y",     -400,  400,    0, "px", "px"],
+        ]},
+        { name: "Image", controls: [
+            ["Scale",     "--img-scale",   50,  250,  100, "",  "%"],
+            ["Image X",   "--img-x",     -400,  400,    0, "px", "px"],
+            ["Image Y",   "--img-y",     -400,  400,    0, "px", "px"],
+            ["Frame X",   "--frame-x",   -600,  600,    0, "px", "px"],
+            ["Frame Y",   "--frame-y",   -600,  600,    0, "px", "px"],
+        ]},
+        { name: "Background", controls: [
+            ["Scale",      "--bg-scale", 100,  300,  120, "",  "%"],
+            ["Position X", "--bg-x",    -600,  600,    0, "px", "px"],
+            ["Position Y", "--bg-y",    -600,  600,   40, "px", "px"],
+        ]},
+    ];
+
+    const STORE_KEY = "aurora-banner-controls-v2";
+    const root = document.documentElement;
+    const tabsEl = document.getElementById("tabs");
+    const panesEl = document.getElementById("panes");
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}");
+
+    function setVar(cssVar, value, unit) {
+        root.style.setProperty(cssVar, value + unit);
+    }
+
+    function buildRow(pane, [label, cssVar, min, max, def, cssUnit, dispUnit]) {
+        const value = saved[cssVar] ?? def;
+        setVar(cssVar, value, cssUnit);
+
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+            <label>${label} <span class="val">${value}${dispUnit}</span></label>
+            <div class="inputs">
+                <input type="range"  min="${min}" max="${max}" value="${value}">
+                <input type="number" min="${min}" max="${max}" value="${value}">
+            </div>`;
+        pane.appendChild(row);
+
+        const range = row.querySelector('input[type=range]');
+        const num   = row.querySelector('input[type=number]');
+        const valEl = row.querySelector('.val');
+
+        function update(v) {
+            v = Math.max(min, Math.min(max, +v || 0));
+            range.value = v; num.value = v;
+            valEl.textContent = v + dispUnit;
+            setVar(cssVar, v, cssUnit);
+            saved[cssVar] = v;
+            localStorage.setItem(STORE_KEY, JSON.stringify(saved));
+        }
+        range.addEventListener("input", e => update(e.target.value));
+        num.addEventListener("input",  e => update(e.target.value));
+    }
+
+    function render() {
+        tabsEl.innerHTML = "";
+        panesEl.innerHTML = "";
+        GROUPS.forEach((group, i) => {
+            const tab = document.createElement("button");
+            tab.textContent = group.name;
+            tab.className = i === 0 ? "active" : "";
+            tabsEl.appendChild(tab);
+
+            const pane = document.createElement("div");
+            pane.className = "pane" + (i === 0 ? " active" : "");
+            panesEl.appendChild(pane);
+            group.controls.forEach(c => buildRow(pane, c));
+
+            tab.addEventListener("click", () => {
+                [...tabsEl.children].forEach(b => b.classList.remove("active"));
+                [...panesEl.children].forEach(p => p.classList.remove("active"));
+                tab.classList.add("active");
+                pane.classList.add("active");
+            });
+        });
+    }
+
+    render();
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        localStorage.removeItem(STORE_KEY);
+        for (const k in saved) delete saved[k];
+        // clear inline overrides so defaults from :root apply again
+        GROUPS.forEach(g => g.controls.forEach(c => root.style.removeProperty(c[1])));
+        render();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async (e) => {
+        const all = GROUPS.flatMap(g => g.controls);
+        const css = ":root {\n" + all.map(([, v]) =>
+            `    ${v}: ${getComputedStyle(root).getPropertyValue(v).trim()};`).join("\n") + "\n}";
+        try { await navigator.clipboard.writeText(css); e.target.textContent = "Copied!"; }
+        catch { e.target.textContent = "Copy failed"; }
+        setTimeout(() => e.target.textContent = "Copy CSS", 1200);
+    });
+
+    document.getElementById("panelHead").addEventListener("click", () => {
+        document.getElementById("panel").classList.toggle("collapsed");
+    });
+</script>
+</body>
+</html>

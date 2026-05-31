@@ -1,18 +1,35 @@
-# Aurora Theme
+# Aurora
 
-A minimalistic dark theme for JetBrains IDEs with clean syntax highlighting.
+A minimalistic dark theme with clean syntax highlighting for JetBrains IDEs.
 
-![Aurora Theme Preview](preview.png)
+![Aurora Theme Preview](banner/banner.png)
+
+## Compatibility
+
+Requires a JetBrains IDE **2025.3 or newer** (build `253`+), where the Islands layout is available.
 
 ## Installation
 
-1. Download the latest release from [Releases](https://github.com/bxacosta/aurora-theme/releases)
-2. Go to `File` → `Settings` → `Plugins`
-3. Click the gear icon and select `Install Plugin from Disk`
-4. Select the downloaded `.jar` file
-5. Restart your IDE
-6. Go to `File` → `Settings` → `Editor` → `Color Scheme`
-7. Select `Aurora` from the dropdown
+### From disk
+
+Download the latest `.zip` from the [Releases](../../releases) page (or build it locally, see below), then
+**Settings | Plugins | ⚙ | Install Plugin from Disk…** and pick the ZIP.
+
+After installing, open **Settings | Appearance & Behavior | Appearance** and select *Aurora*.
+
+## Development
+
+Build the distributable ZIP (generated in `build/distributions/`):
+
+```bash
+./gradlew buildPlugin
+```
+
+Run a sandbox IDE with the theme preinstalled:
+
+```bash
+./gradlew runIde
+```
 
 ## Inspiration
 
