@@ -1,13 +1,9 @@
 <idea-plugin>
     <id>aurora-code</id>
-    <version>1.0.0</version>
-
     <name>Aurora</name>
     <category>UI</category>
 
     <vendor url="https://github.com/bxacosta/aurora-code-theme">bxacosta</vendor>
-
-    <idea-version since-build="251"/>
 
     <description><![CDATA[
         A minimalistic dark theme with clean syntax highlighting.<br>
@@ -18,9 +14,11 @@
         Initial release of the theme.
     ]]></change-notes>
 
+    <!-- Platform-only dependency -> compatible with ALL JetBrains IDEs -->
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <!-- id kept identical to the previous published version to preserve the theme reference -->
         <themeProvider id="aurora-code" path="/theme/aurora.theme.json"/>
     </extensions>
 </idea-plugin>

@@ -1,0 +1,33 @@
+{
+  "name": "Aurora",
+  "dark": true,
+  "author": "bxacosta",
+  "editorScheme": "/theme/aurora.xml",
+  "parentTheme": "Islands Dark",
+  "colors": {
+    "gray-10": "#090a0c",
+    "gray-20": "#090a0c",
+    "gray-30": "#0d0f11",
+    "gray-40": "#0d0f11",
+    "layer-0-border": "#1f2328",
+    "layer-1-border": "#1f2328",
+    "layer-2-border": "#1f2328",
+    "layer-0-border-inline": "#1f2328",
+    "layer-1-border-inline": "#1f2328",
+    "layer-2-border-inline": "#1f2328",
+    "control-border": "#1f2328",
+    "control-border-disabled": "#1f2328",
+    "control-border-raised": "#1f2328",
+    "control-border-small": "#1f2328",
+    "container-dialog-bg": "#090a0c",
+    "container-popup-bg": "#090a0c",
+    "container-popup-bg-inline": "#090a0c",
+    "feedback-border": "#1f2328"
+  },
+  "ui": {
+    "Island.borderColor": "#1f2328",
+    "alt": {
+      "Island.borderColor": "#1f2328"
+    }
+  }
+}
