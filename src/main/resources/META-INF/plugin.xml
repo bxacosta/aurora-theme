@@ -6,12 +6,15 @@
     <vendor url="https://github.com/bxacosta/aurora-code-theme">bxacosta</vendor>
 
     <description><![CDATA[
-        A minimalistic dark theme with clean syntax highlighting.<br>
-        <em>Simple, elegant coding experience.</em>
+        A dark theme for JetBrains IDEs with a minimal color palette and clean, consistent syntax highlighting across languages.
     ]]></description>
 
     <change-notes><![CDATA[
-        Initial release of the theme.
+        <b>1.1.0</b>
+        <ul>
+            <li>Added Python syntax color scheme (PyCharm).</li>
+            <li>Minor file status color adjustments.</li>
+        </ul>
     ]]></change-notes>
 
     <!-- Platform-only dependency -> compatible with ALL JetBrains IDEs -->
