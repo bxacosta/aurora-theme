@@ -4,7 +4,7 @@
     <property name="ide">idea</property>
     <property name="vendorName">bxacosta</property>
     <property name="vendorUrl">https://github.com/bxacosta/aurora-code-theme</property>
-    <property name="version">1.0.0</property>
+    <property name="version">1.1.0</property>
   </metaInfo>
   <colors>
     <option name="ADDED_LINES_COLOR" value="85E89D" />
