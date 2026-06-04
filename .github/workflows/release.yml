@@ -22,7 +22,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Make gradlew executable
         run: chmod +x gradlew
@@ -38,7 +38,7 @@ jobs:
 
       # Attach the signed ZIP as a GitHub Release asset (manual install).
       - name: Attach plugin ZIP to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: build/distributions/*.zip
           generate_release_notes: true
